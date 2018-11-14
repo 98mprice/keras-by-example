@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <style>
+    #app {
+      font-family: Avenir-Heavy;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-content>
+        <v-container>
+          <v-stepper v-model="e6" vertical>
+    <v-stepper-step :complete="e6 > 1" step="1">
+      Model Architecture
+      <small>What type of problem are you trying to solve?</small>
+    </v-stepper-step>
+
+    <v-stepper-content step="1">
+      <v-layout column align-center>
+        <v-layout row>
+          <v-tooltip
+            top
+            flat
+            v-for="model in model_architectures"
+            :key="model.name">
+            <v-btn
+              @click="selected_architecture = model"
+              slot="activator"
+              :color="model.color"
+              fab
+              large
+              dark
+              flat>
+              <v-icon>{{model.icon}}</v-icon>
+            </v-btn>
+            <span>{{model.name}}</span>
+          </v-tooltip>
+        </v-layout>
+        <div v-if="selected_architecture">
+          <h3 :style="{'color': selected_architecture.color}">{{selected_architecture.name}} <small>({{selected_architecture.acronym}})</small></h3>
+          <h4 v-html="selected_architecture.description"></h4>
+          <h5>
+            <span v-for="type in selected_architecture.problem_types.slice(0, selected_architecture.problem_types.length - 1)">
+              {{type}},
+            </span>
+            {{selected_architecture.problem_types[selected_architecture.problem_types.length - 1]}}
+          </h5>
+          <h5>Examples</h5>
+          <h5>
+            <ul>
+              <li v-for="example in selected_architecture.examples">{{example}}</li>
+            </ul>
+          </h5>
+        </div>
+      </v-layout>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn :disabled="!selected_architecture" flat @click="e6++">Continue</v-btn>
+      </v-card-actions>
+    </v-stepper-content>
+
+    <v-stepper-step :complete="e6 > 2" step="2">
+      Input Shape
+      <small>What dimensions are your input?</small>
+    </v-stepper-step>
+
+    <v-stepper-content step="2">
+      <v-card color="grey lighten-1" class="mb-5" height="200px"></v-card>
+
+      <v-card-actions>
+        <v-btn :disabled="!selected_architecture" flat @click="e6--">Back</v-btn>
+        <v-spacer></v-spacer>
+        <v-btn :disabled="!selected_architecture" flat @click="e6++">Continue</v-btn>
+      </v-card-actions>
+    </v-stepper-content>
+
+    <v-stepper-step :complete="e6 > 3" step="3">Options</v-stepper-step>
+
+    <v-stepper-content step="3">
+      <v-container class="pa-3">
+        <v-checkbox
+          v-for="option in options"
+          :key="option.name"
+          :label="option.name"
+          v-model="option.selected"
+          color="blue"
+        ></v-checkbox>
+      </v-container>
+      <v-card-actions>
+        <v-btn :disabled="!selected_architecture" flat @click="e6--">Back</v-btn>
+        <v-spacer></v-spacer>
+        <v-btn :disabled="!selected_architecture" flat @click="e6++">Done</v-btn>
+      </v-card-actions>
+    </v-stepper-content>
+
+  </v-stepper>
+        </v-container>
+      </v-content>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        e6: 1,
+        options: [
+          {
+            name: 'print summary',
+            selected: false
+          },
+          {
+            name: 'save model',
+            selected: false
+          },
+          {
+            name: 'add callback',
+            selected: false
+          },
+          {
+            name: 'shuffle data',
+            selected: false
+          }
+        ],
+        definitions: {
+          activation: 'mathematical function that determines whether or not a neuron should fire'
+        },
+        selected_architecture: null,
+        model_architectures: [
+          {
+            name: 'Multilayer Perceptron',
+            acronym: 'MLP',
+            icon: 'category',
+            color: 'red',
+            description: 'Classical neural network',
+            problem_types: [
+              'Classification prediction',
+              'Regression prediction'
+            ],
+            examples: [
+              'predict a missing value in a tabular dataset'
+            ]
+          },
+          {
+            name: 'Convolutional Neural Network',
+            acronym: 'CNN',
+            icon: 'art_track',
+            color: 'orange',
+            description: 'Good at recognising patterns across space',
+            problem_types: [
+              'Classification prediction',
+              'Regression prediction'
+            ],
+            examples: [
+              'classify images e.g. dogs vs cats',
+              'classify sounds via stereographs',
+              'orientation of images'
+            ]
+          },
+          {
+            name: 'Recurrent Neural Network',
+            acronym: 'RNN',
+            icon: 'fiber_smart_record',
+            color: 'blue',
+            description: 'Good at recognising sequences, or patterns across time.<br>They retain a \'memory\' of previous inputs.',
+            problem_types: [
+              'Classification prediction',
+              'Regression prediction',
+              'Generative models'
+            ],
+            examples: [
+              'predict a missing word/number in a sequence',
+              'generate the next word/ character from a corpus of text',
+              'sentiment analysis',
+              'classify sound via FFTs'
+            ]
+          },
+          {
+            name: 'Generative Adversarial Networks',
+            acronym: 'GAN',
+            icon: 'label_important',
+            color: 'green',
+            description: 'Two neural networks pitted against one another',
+            problem_types: [
+              'Generative models'
+            ],
+            examples: [
+              'text to image generation & vica versa',
+              'increasing image resolution',
+              'predicting next video frame',
+              'generating new images'
+            ]
+          }
+        ]
+      },
+      mounted: function() {
+        /*var client = new XMLHttpRequest();
+        client.open('GET', 'cnn/mnist.py');
+        client.onreadystatechange = function() {
+          console.log(client.responseText);
+        }
+        client.send();*/
+      }
+    })
+  </script>
+</body>
+</html>
